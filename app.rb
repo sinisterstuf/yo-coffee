@@ -8,6 +8,9 @@ base_url = ''
 get '/' do
     Net::HTTP.post_form(URI.parse(
         'https://api.justyo.co/yoall/'),
-        {'api_token' => ENV['YO_KEY']}
+        {
+            'api_token' => ENV['YO_KEY'],
+            'link' => 'http://yotext.co/show/?text=COFFEE TIME?'
+        }
     )
 end
