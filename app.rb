@@ -2,9 +2,28 @@ require 'sinatra'
 require 'net/http'
 require 'redis'
 
+# Set up Sinatra
 set :server, 'thin'
 base_url = ''
+
+# Set up Redis
 redis = Redis.new(:url => ENV['REDISTOGO_URL'])
+
+# Constants
+yoapi_url  = 'https://api.justyo.co/'
+yotext_url = 'http://yotext.co/show/?text='
+yotype = 'yoall'
+postdata = { api_token: ENV['YO_KEY'] }
+
+# Test mode sends Yo to test user instead of YoAll
+if ENV['RUN_MODE'] == 'TEST'
+    logger.info "test mode: only Yo to #{ENV['TEST_USER']}"
+    yotype = 'yo'
+    postdata[:username] = ENV['TEST_USER']
+end
+
+redis.set('foo', 'bar')
+puts redis.get('foo')
 
 get '/' do
 
@@ -16,10 +35,9 @@ get '/' do
 
         # never mind this coffee session if nobody responds in time
         redis.expire('people', 60)
-
     end
 
-    # return name or count depending on card
+    # return name or count depending on cardinality
     headcount = redis.scard('people')
     subject =
         if headcount < 2
@@ -33,15 +51,10 @@ get '/' do
 
     text = "#{subject} would like coffee!"
     logger.info text
+    postdata[:link] = yotext_url + text
 
-    # do a YoAll
-    status = Net::HTTP.post_form(URI.parse(
-        'https://api.justyo.co/yoall/'),
-        {
-            'api_token' => ENV['YO_KEY'],
-            'link' => "http://yotext.co/show/?text=" + text,
-        }
-    )
+    # send the Yo
+    status = Net::HTTP.post_form(URI.parse(yoapi_url + yotype + '/'), postdata)
 
     # terse status response
     if status
