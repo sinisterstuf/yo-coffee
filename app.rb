@@ -40,7 +40,9 @@ get '/' do
     # return name or count depending on cardinality
     headcount = redis.scard('people')
     subject =
-        if headcount < 2
+        if headcount < 1
+            "nobody"
+        elsif headcount < 2
             redis.srandmember('people')
         elsif headcount < 3
             redis.srandmember('people', 2).join(' and ')
