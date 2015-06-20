@@ -23,11 +23,12 @@ get '/' do
     headcount = redis.scard('people')
     subject =
         if headcount < 2
-            logger.info "personal subject"
             redis.srandmember('people')
+        elsif headcount < 3
+            redis.srandmember('people', 2).join(' and ')
         else
             logger.info "cardinal subject"
-            headcount.to_s + "people"
+            "#{headcount} people"
         end
 
     text = "#{subject} would like coffee!"
