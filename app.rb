@@ -8,6 +8,8 @@ redis = Redis.new(:url => ENV['REDISTOGO_URL'])
 
 get '/' do
 
+    logger.info "got request"
+
     if params.key?('username')
         logger.info "adding user to redis"
         redis.sadd('people', params['username'])
@@ -21,12 +23,15 @@ get '/' do
     headcount = redis.scard('people')
     subject =
         if headcount < 2
+            logger.info "personal subject"
             redis.srandmember('people')
         else
+            logger.info "cardinal subject"
             headcount.to_s + "people"
         end
 
     text = "#{subject} would like coffee!"
+    logger.info text
 
     # do a YoAll
     status = Net::HTTP.post_form(URI.parse(
@@ -39,8 +44,10 @@ get '/' do
 
     # terse status response
     if status
+        logger.info 'success'
         'success'
     else
+        logger.info 'failed to YoAll'
         'failed to YoAll'
     end
 
