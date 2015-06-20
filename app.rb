@@ -17,7 +17,6 @@ postdata = { api_token: ENV['YO_KEY'] }
 
 # Test mode sends Yo to test user instead of YoAll
 if ENV['RUN_MODE'] == 'TEST'
-    logger.info "test mode: only Yo to #{ENV['TEST_USER']}"
     yotype = 'yo'
     postdata[:username] = ENV['TEST_USER']
 end
@@ -28,6 +27,8 @@ puts redis.get('foo')
 get '/' do
 
     logger.info "got request"
+    logger.info "#{ENV['RUN_MODE']} mode"
+    logger.info "only Yo to #{ENV['TEST_USER']}" if ENV['RUN_MODE'] == 'TEST'
 
     if params.key?('username')
         logger.info "adding user to redis"
