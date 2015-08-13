@@ -21,9 +21,6 @@ if ENV['RUN_MODE'] == 'TEST'
     postdata[:username] = ENV['TEST_USER']
 end
 
-redis.set('foo', 'bar')
-puts redis.get('foo')
-
 get '/' do
 
     logger.info "got request"
