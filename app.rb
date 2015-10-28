@@ -9,9 +9,12 @@ base_url = ''
 # Set up Redis
 redis = Redis.new(:url => ENV['REDISTOGO_URL'])
 
+# Get colour list
+require_relative 'colors'
+
 # Constants
 yoapi_url  = 'https://api.justyo.co/'
-yotext_url = 'http://yotext.co/show/?text='
+yotext_url = ENV['OWN_URL'] + '/show?text='
 yotype = 'yoall'
 postdata = { api_token: ENV['YO_KEY'] }
 
@@ -65,4 +68,12 @@ get '/' do
         'failed to YoAll'
     end
 
+end
+
+get '/show' do
+    logger.info "got text request: #{params['text']}"
+    return erb :show, :locals => {
+        :text => params['text'],
+        :color => colors.sample
+    }
 end
